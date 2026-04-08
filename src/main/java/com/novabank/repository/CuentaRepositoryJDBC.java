@@ -36,25 +36,6 @@ public class CuentaRepositoryJDBC implements CuentaRepository {
     }
 
     @Override
-    public Optional<Cuenta> buscarPorId(Long id) {
-        String sql = "SELECT * FROM cuentas WHERE id = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, id);
-
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return Optional.of(mapRowToCuenta(rs));
-            }
-
-            return Optional.empty();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al buscar cuenta por ID", e);
-        }
-    }
-
-    @Override
     public Optional<Cuenta> buscarPorNumeroCuenta(String numeroCuenta) {
         String sql = "SELECT * FROM cuentas WHERE numero_cuenta = ?";
 
@@ -69,7 +50,7 @@ public class CuentaRepositoryJDBC implements CuentaRepository {
             return Optional.empty();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error al buscar cuenta por número", e);
+            throw new RuntimeException("Error al buscar cuenta por número de cuenta", e);
         }
     }
 
@@ -113,11 +94,6 @@ public class CuentaRepositoryJDBC implements CuentaRepository {
         }
     }
 
-    @Override
-    public List<Cuenta> buscarTodos() {
-        return listarCuentas();
-    }
-
     private Cuenta mapRowToCuenta(ResultSet rs) throws SQLException {
         String numeroCuenta = rs.getString("numero_cuenta");
         Long clienteId = rs.getLong("cliente_id");
@@ -125,7 +101,6 @@ public class CuentaRepositoryJDBC implements CuentaRepository {
         Cliente cliente = clienteRepository.buscarPorId(clienteId)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado para la cuenta"));
 
-        // Usamos tu constructor actual
         return new Cuenta(cliente, numeroCuenta);
     }
 }

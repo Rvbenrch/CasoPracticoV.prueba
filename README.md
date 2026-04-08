@@ -395,4 +395,5 @@ El método `guardar(Long cuentaId, Movimiento movimiento)` inserta un nuevo movi
 Los métodos `buscarPorCuentaId` y `buscarPorCuentaIdYRangoFechas` permiten consultar el historial de movimientos de una cuenta, pudiendo filtrar por un intervalo de fechas.     
 El método `buscarTodos` devuelve todos los movimientos registrados en la base de datos.   
 El método privado `mapRowToMovimiento` convierte cada fila del ResultSet en un objeto Movimiento, reconstruyendo todos sus atributos (id, cuentaId, tipo, importe y fecha).
-4. 
+
+

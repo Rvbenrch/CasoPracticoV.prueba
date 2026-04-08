@@ -1,53 +1,41 @@
 package com.novabank.service;
 
-import com.novabank.exception.CuentaNoEncontrada;
-import com.novabank.model.Cuenta;
 import com.novabank.model.Movimiento;
+import com.novabank.repository.MovimientoRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ConsultaService {
 
-    private CuentaService cuentaService;
+    private final CuentaService cuentaService;
+    private final MovimientoRepository movimientoRepository;
 
-    public ConsultaService(CuentaService cuentaService) {
+    public ConsultaService(CuentaService cuentaService, MovimientoRepository movimientoRepository) {
         this.cuentaService = cuentaService;
+        this.movimientoRepository = movimientoRepository;
     }
 
     public double consultarSaldo(String numeroCuenta) {
-        Cuenta cuenta = cuentaService.buscarPorNumeroCuenta(numeroCuenta);
-        return cuenta.getSaldo();
+        return cuentaService.buscarPorNumeroCuenta(numeroCuenta).getSaldo();
     }
 
-
     public List<Movimiento> obtenerHistorial(String numeroCuenta) {
-        Cuenta cuenta = cuentaService.buscarPorNumeroCuenta(numeroCuenta);
-
-        return cuenta.getMovimientos()
-                .stream()
-                .sorted(Comparator.comparing(Movimiento::getFecha).reversed())
-                .collect(Collectors.toList());
+        Long cuentaId = cuentaService.buscarPorNumeroCuenta(numeroCuenta).getId();
+        return movimientoRepository.buscarPorCuentaId(cuentaId);
     }
 
     public List<Movimiento> obtenerMovimientosPorRango(String numeroCuenta,
                                                        LocalDate fechaInicio,
                                                        LocalDate fechaFin) {
 
-        Cuenta cuenta = cuentaService.buscarPorNumeroCuenta(numeroCuenta);
+        Long cuentaId = cuentaService.buscarPorNumeroCuenta(numeroCuenta).getId();
 
         LocalDateTime inicio = fechaInicio.atStartOfDay();
         LocalDateTime fin = fechaFin.atTime(LocalTime.MAX);
 
-        return cuenta.getMovimientos()
-                .stream()
-                .filter(m -> !m.getFecha().isBefore(inicio)
-                        && !m.getFecha().isAfter(fin))
-                .sorted(Comparator.comparing(Movimiento::getFecha).reversed())
-                .collect(Collectors.toList());
+        return movimientoRepository.buscarPorCuentaIdYRangoFechas(cuentaId, inicio, fin);
     }
 }
