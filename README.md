@@ -342,6 +342,24 @@ la base de datos, evitando el incremento automático del identificador interno. 
 setId(Long id) para permitir que el repositorio JDBC asigne el identificador generado por PostgreSQL tras una inserción.
 Estas modificaciones permiten que la clase sea compatible tanto con repositorios en memoria como con repositorios basados en JDBC.
 
+   
+4. `Cuenta` se ha ampliado para permitir su uso con repositorios JDBC y base de datos relacionales.
+Se ha añadadio un atributo `id` que representa la clave primaria generada por PostgreSQL. Se ha incorporado un nuevo método serId(Long id)
+esto permite asignar al objeto el identificador generado.
+
+
+5. `Movimiento`  Para guardar un movimiento en la BD se necesita saber a qué cuenta pertenece, por eso añadimos cuentaId.
+Para reconstruir un movimiento desde la BD se necesita:
+- id
+- cuentaId
+- tipo
+- importe
+- fecha
+
+Hemos añadido un segundo constructor en las 3 clases puesto que necesitabamos el id para asignarle al constructor los valores
+que nos falten.
+
+
 --- 
 <div align="center">
 
@@ -362,5 +380,19 @@ en objetos.
 -  Para convertir una fila de la base de datos (ResultSet) en un objeto Cliente de Java se usa `mapRowToCliente`
 
 
-2. `CuenteRepositoryJDBC`
-3. `MovimientoRepositoryJDBC`
+2. `CuentaRepositoryJDBC` este repositorio tiene que implementar `CuentaRepository` y proporcionar:
+
+- guardar(Cuenta cuenta)
+- buscarPorId(Long id)
+- buscarPorNumeroCuenta(String numeroCuenta)
+- buscarPorClienteId(Long clienteId)
+- Además, debe convertir las filas de las tablas SQL en objetos Cuenta.
+
+
+3. `MovimientoRepositoryJDBC` implementa la interfaz de `MovimientoRepository` utilizando JDBC para interactuar con la tabla `movimientos` 
+de la base de datos.
+El método `guardar(Long cuentaId, Movimiento movimiento)` inserta un nuevo movimiento asociado a una cuenta concreta y recupera el identificador generado por PostgreSQL mediante `RETURNING id`.   
+Los métodos `buscarPorCuentaId` y `buscarPorCuentaIdYRangoFechas` permiten consultar el historial de movimientos de una cuenta, pudiendo filtrar por un intervalo de fechas.     
+El método `buscarTodos` devuelve todos los movimientos registrados en la base de datos.   
+El método privado `mapRowToMovimiento` convierte cada fila del ResultSet en un objeto Movimiento, reconstruyendo todos sus atributos (id, cuentaId, tipo, importe y fecha).
+4. 

@@ -1,5 +1,8 @@
 package com.novabank.model;
 
+import com.novabank.model.Cliente;
+import com.novabank.model.Movimiento;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,12 +11,14 @@ import static com.novabank.model.TipoMovimiento.*;
 
 public class Cuenta {
 
+    private Long id;
     private String numeroCuenta;
     private Cliente titular;
     private double saldo;
     private LocalDateTime fechaCreacion;
     private List<Movimiento> movimientos;
 
+    // Constructor para CUENTAS NUEVAS
     public Cuenta(Cliente titular, String numeroCuenta) {
         this.titular = titular;
         this.numeroCuenta = numeroCuenta;
@@ -21,6 +26,25 @@ public class Cuenta {
         this.saldo = 0;
         this.movimientos = new ArrayList<>();
     }
+
+    // Constructor para CUENTAS QUE VIENEN DE LA BD
+    public Cuenta(Long id, Cliente titular, String numeroCuenta, double saldo, LocalDateTime fechaCreacion) {
+        this.id = id;
+        this.titular = titular;
+        this.numeroCuenta = numeroCuenta;
+        this.saldo = saldo;
+        this.fechaCreacion = fechaCreacion;
+        this.movimientos = new ArrayList<>();
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
 
 
     // OPERACIONES DE NEGOCIO
