@@ -309,6 +309,15 @@ public static Connection getConnection() {
 - Si la conexión no existe se crea, si existe la devuelve.
 - Con `DriverManager.getConnection(..)` llamamos para conectarnos a PostgreSQL usando JDBC.
 
+---
+
+<div align="center">
+
+#### Adaptación de clases
+
+</div>
+
+--- 
 Se necesita realizar modificaciones en las clases `ClienteService` y en la clase `CuentaService`.
 1. `CuentaService` tenía una función que buscaba por número de cuenta, si la cuenta era null, entonces saltaba una excepción.
 En las modificaciones en el repositorio hemos puesto
@@ -327,3 +336,31 @@ if (repository.buscarPorDni(dni) != null)
 Pero como `buscarPorDni` ahora mismo devuelve un Opcional, ese opcional núnca puede ser nullo, por lo que el compilador detecta 
 que hay un problema dónde esperamos un Cliente.
 
+
+3. `Cliente` se ha ampliado con un segundo constructor que permite crear instancias a partir de datos provenientes de 
+la base de datos, evitando el incremento automático del identificador interno. Además, se ha añadido un método
+setId(Long id) para permitir que el repositorio JDBC asigne el identificador generado por PostgreSQL tras una inserción.
+Estas modificaciones permiten que la clase sea compatible tanto con repositorios en memoria como con repositorios basados en JDBC.
+
+--- 
+<div align="center">
+
+#### JDBC Configuration
+
+</div>
+
+---
+
+Para este apartado necesitamos llevar a cabo una implementación de los repositorios para que puedan comunicarse con la 
+base de datos PostgreSQL, su función es actuar como puente ejecutando consultas SQL reales y conviertiendo los resultados 
+en objetos.
+
+1. `ClienteRepositoryJDBC` lleva a cabo los siguientes métodos **CRUD**:
+- guardar(): Ejecuta un `INSERT` para recuperar el id generado por la base de datos.
+- `buscarPorId()`, `buscarPorDni()`, `buscarPorEmail()`, `buscarPorTelefono()`  ejecutan consultas `SELECT` con filtros
+- `buscarTodos()` devuelve todos los clientes de la tabla.
+-  Para convertir una fila de la base de datos (ResultSet) en un objeto Cliente de Java se usa `mapRowToCliente`
+
+
+2. `CuenteRepositoryJDBC`
+3. `MovimientoRepositoryJDBC`
