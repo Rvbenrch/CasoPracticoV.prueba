@@ -2,7 +2,8 @@
 
 import com.novabank.model.Cliente;
 import com.novabank.model.Cuenta;
-import com.novabank.model.TipoMovimiento;
+import com.novabank.repository.ClienteRepositoryMemory;
+import com.novabank.repository.CuentaRepositoryMemory;
 import com.novabank.service.ClienteService;
 import com.novabank.service.ConsultaService;
 import com.novabank.service.CuentaService;
@@ -22,8 +23,8 @@ class ConsultaServiceTest {
 
     @BeforeEach
     void setup() {
-        clienteService = new ClienteService(new com.novabank.repository.ClienteRepository());
-        cuentaService = new CuentaService(new com.novabank.repository.CuentaRepository(), clienteService);
+        clienteService = new ClienteService(new ClienteRepositoryMemory());
+        cuentaService = new CuentaService(new CuentaRepositoryMemory(), clienteService);
         consultaService = new ConsultaService(cuentaService);
     }
 
