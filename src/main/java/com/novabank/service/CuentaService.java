@@ -10,14 +10,13 @@ import com.novabank.repository.interfaz.CuentaRepository;
 import com.novabank.repository.interfaz.MovimientoRepository;
 
 import java.util.List;
+import java.util.UUID;
 
 public class CuentaService {
 
     private final CuentaRepository cuentaRepository;
     private final ClienteService clienteService;
     private final MovimientoRepository movimientoRepository;
-
-    private static long contadorCuentas = 1;
 
     public CuentaService(CuentaRepository cuentaRepository,
                          ClienteService clienteService,
@@ -36,13 +35,19 @@ public class CuentaService {
             throw new ClienteNoEncontradoException("El cliente no se ha encontrado.");
         }
 
-        String numeroSecuencial = String.format("%012d", contadorCuentas++);
-        String numeroCuenta = "ES91210000" + numeroSecuencial;
+        // Generación segura del número de cuenta
+        String numeroCuenta = generarNumeroCuenta();
 
         Cuenta cuenta = new Cuenta(cliente, numeroCuenta);
         cuentaRepository.guardar(cuenta);
 
         return cuenta;
+    }
+
+    private String generarNumeroCuenta() {
+        // Genera un número de cuenta único y seguro
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        return "ES91" + uuid.substring(0, 20);
     }
 
     public Cuenta buscarPorNumeroCuenta(String numeroCuenta) {
@@ -70,6 +75,9 @@ public class CuentaService {
         Movimiento movimiento = new Movimiento(TipoMovimiento.DEPOSITO, cantidad);
         movimientoRepository.guardar(cuenta.getId(), movimiento);
 
+        // Persistir el nuevo saldo
+        cuentaRepository.actualizarSaldo(cuenta);
+
         return cuenta;
     }
 
@@ -81,6 +89,9 @@ public class CuentaService {
         Movimiento movimiento = new Movimiento(TipoMovimiento.RETIRO, cantidad);
         movimientoRepository.guardar(cuenta.getId(), movimiento);
 
+        // Persistir el nuevo saldo
+        cuentaRepository.actualizarSaldo(cuenta);
+
         return cuenta;
     }
 
@@ -90,10 +101,15 @@ public class CuentaService {
 
         cuentaOrigen.transferirA(cuentaDestino, cantidad);
 
+        // Registrar movimientos
         movimientoRepository.guardar(cuentaOrigen.getId(),
                 new Movimiento(TipoMovimiento.TRANSFERENCIA_SALIENTE, cantidad));
 
         movimientoRepository.guardar(cuentaDestino.getId(),
                 new Movimiento(TipoMovimiento.TRANSFERENCIA_ENTRANTE, cantidad));
+
+        // Persistir ambos saldos
+        cuentaRepository.actualizarSaldo(cuentaOrigen);
+        cuentaRepository.actualizarSaldo(cuentaDestino);
     }
 }

@@ -11,33 +11,33 @@ import java.util.Optional;
 
 public class ClienteRepositoryJDBC implements ClienteRepository {
 
-    private final Connection connection;
-
     public ClienteRepositoryJDBC() {
-        this.connection = DatabaseConnection.getConnection();
+        // No guardamos conexión global
     }
 
     @Override
-    public  Cliente  guardar(Cliente  cliente)  {
-        String sql  =  "INSERT  INTO  clientes (nombre,  apellidos,  dni,  email,  telefono) "  +
-                "VALUES (?,  ?,  ?,  ?,  ?) RETURNING  id";
+    public Cliente guardar(Cliente cliente) {
+        String sql = "INSERT INTO clientes (nombre, apellidos, dni, email, telefono) " +
+                "VALUES (?, ?, ?, ?, ?) RETURNING id";
 
-        try  (PreparedStatement  stmt =  connection.prepareStatement(sql))  {
-            stmt.setString(1,  cliente.getNombre());
-            stmt.setString(2,  cliente.getApellidos());
-            stmt.setString(3,  cliente.getDni());
-            stmt.setString(4,  cliente.getEmail());
-            stmt.setString(5,  cliente.getTelefono());
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
 
-            ResultSet  rs  = stmt.executeQuery();
-            if (rs.next())  {
-                cliente.setId(rs.getLong("id")); //  ✅  ahora  existe  setId
+            stmt.setString(1, cliente.getNombre());
+            stmt.setString(2, cliente.getApellidos());
+            stmt.setString(3, cliente.getDni());
+            stmt.setString(4, cliente.getEmail());
+            stmt.setString(5, cliente.getTelefono());
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                cliente.setId(rs.getLong("id"));
             }
 
-            return  cliente;
+            return cliente;
 
-        }  catch  (SQLException  e)  {
-            throw  new RuntimeException("Error  al  guardar  cliente",  e);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al guardar cliente", e);
         }
     }
 
@@ -45,10 +45,12 @@ public class ClienteRepositoryJDBC implements ClienteRepository {
     public Optional<Cliente> buscarPorId(Long id) {
         String sql = "SELECT * FROM clientes WHERE id = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, id);
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
 
+            stmt.setLong(1, id);
             ResultSet rs = stmt.executeQuery();
+
             if (rs.next()) {
                 return Optional.of(mapRowToCliente(rs));
             }
@@ -64,10 +66,12 @@ public class ClienteRepositoryJDBC implements ClienteRepository {
     public Optional<Cliente> buscarPorDni(String dni) {
         String sql = "SELECT * FROM clientes WHERE dni = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, dni);
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
 
+            stmt.setString(1, dni);
             ResultSet rs = stmt.executeQuery();
+
             if (rs.next()) {
                 return Optional.of(mapRowToCliente(rs));
             }
@@ -83,10 +87,12 @@ public class ClienteRepositoryJDBC implements ClienteRepository {
     public Optional<Cliente> buscarPorEmail(String email) {
         String sql = "SELECT * FROM clientes WHERE email = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, email);
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
 
+            stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
+
             if (rs.next()) {
                 return Optional.of(mapRowToCliente(rs));
             }
@@ -102,10 +108,12 @@ public class ClienteRepositoryJDBC implements ClienteRepository {
     public Optional<Cliente> buscarPorTelefono(String telefono) {
         String sql = "SELECT * FROM clientes WHERE telefono = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, telefono);
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
 
+            stmt.setString(1, telefono);
             ResultSet rs = stmt.executeQuery();
+
             if (rs.next()) {
                 return Optional.of(mapRowToCliente(rs));
             }
@@ -121,10 +129,12 @@ public class ClienteRepositoryJDBC implements ClienteRepository {
     public List<Cliente> buscarTodos() {
         String sql = "SELECT * FROM clientes";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            ResultSet rs = stmt.executeQuery();
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
 
+            ResultSet rs = stmt.executeQuery();
             List<Cliente> clientes = new ArrayList<>();
+
             while (rs.next()) {
                 clientes.add(mapRowToCliente(rs));
             }
@@ -136,8 +146,8 @@ public class ClienteRepositoryJDBC implements ClienteRepository {
         }
     }
 
-    private  Cliente mapRowToCliente(ResultSet  rs)  throws  SQLException  {
-        return new  Cliente(
+    private Cliente mapRowToCliente(ResultSet rs) throws SQLException {
+        return new Cliente(
                 rs.getLong("id"),
                 rs.getString("nombre"),
                 rs.getString("apellidos"),

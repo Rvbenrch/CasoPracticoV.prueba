@@ -64,7 +64,22 @@ public class CuentaRepositoryJDBC implements CuentaRepository {
             throw new RuntimeException("Error al buscar cuenta por número de cuenta", e);
         }
     }
+    @Override
+    public void actualizarSaldo(Cuenta cuenta) {
+        String sql = "UPDATE cuentas SET saldo = ? WHERE id = ?";
 
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setDouble(1, cuenta.getSaldo());
+            stmt.setLong(2, cuenta.getId());
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al actualizar saldo de la cuenta", e);
+        }
+    }
     @Override
     public List<Cuenta> listarCuentas() {
         String sql = "SELECT * FROM cuentas";

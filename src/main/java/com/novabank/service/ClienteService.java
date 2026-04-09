@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ClienteService {
 
-    private ClienteRepository repository;
+    private final ClienteRepository repository;
 
     public ClienteService(ClienteRepository repository) {
         this.repository = repository;
@@ -29,8 +29,9 @@ public class ClienteService {
             throw new ClienteDuplicadoException("Ya existe un cliente con el teléfono: " + telefono);
         }
 
-        if (!email.contains("@") || !email.contains(".")) {
-            throw new IllegalArgumentException("El email no tiene un formato válido. \n El formato del email tiene que ser: ejemplo@dominio.com");
+        // Validación de email mejorada
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            throw new IllegalArgumentException("El email no tiene un formato válido. Ejemplo: ejemplo@dominio.com");
         }
 
         Cliente cliente = new Cliente(nombre, apellidos, dni, email, telefono);

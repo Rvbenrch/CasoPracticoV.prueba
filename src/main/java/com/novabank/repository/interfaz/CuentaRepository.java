@@ -14,4 +14,6 @@ public interface CuentaRepository {
     List<Cuenta> listarCuentas();
 
     List<Cuenta> buscarPorClienteId(Long clienteId);
+
+    void actualizarSaldo(Cuenta cuenta);
 }
