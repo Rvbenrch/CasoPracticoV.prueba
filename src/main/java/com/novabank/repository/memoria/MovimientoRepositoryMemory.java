@@ -1,7 +1,8 @@
-package com.novabank.repository;
+package com.novabank.repository.memoria;
 
 import com.novabank.model.Movimiento;
-import java.util.stream.Collectors;
+import com.novabank.repository.interfaz.MovimientoRepository;
+
 import java.time.LocalDateTime;
 import java.util.*;
 

@@ -1,8 +1,9 @@
-package com.novabank.repository;
+package com.novabank.repository.JDBC;
 
 import com.novabank.config.DatabaseConnection;
 import com.novabank.model.Movimiento;
 import com.novabank.model.TipoMovimiento;
+import com.novabank.repository.interfaz.MovimientoRepository;
 
 import java.sql.*;
 import java.time.LocalDateTime;

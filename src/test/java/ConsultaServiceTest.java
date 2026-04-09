@@ -2,8 +2,8 @@
 
 import com.novabank.model.Cliente;
 import com.novabank.model.Cuenta;
-import com.novabank.repository.ClienteRepositoryMemory;
-import com.novabank.repository.CuentaRepositoryMemory;
+import com.novabank.repository.memoria.ClienteRepositoryMemory;
+import com.novabank.repository.memoria.CuentaRepositoryMemory;
 import com.novabank.service.ClienteService;
 import com.novabank.service.ConsultaService;
 import com.novabank.service.CuentaService;

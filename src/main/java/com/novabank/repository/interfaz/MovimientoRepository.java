@@ -1,4 +1,4 @@
-package com.novabank.repository;
+package com.novabank.repository.interfaz;
 
 import com.novabank.model.Movimiento;
 

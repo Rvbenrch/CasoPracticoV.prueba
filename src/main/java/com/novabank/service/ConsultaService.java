@@ -1,7 +1,7 @@
 package com.novabank.service;
 
 import com.novabank.model.Movimiento;
-import com.novabank.repository.MovimientoRepository;
+import com.novabank.repository.interfaz.MovimientoRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

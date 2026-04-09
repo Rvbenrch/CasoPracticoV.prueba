@@ -1,6 +1,7 @@
-package com.novabank.repository;
+package com.novabank.repository.memoria;
 
 import com.novabank.model.Cliente;
+import com.novabank.repository.interfaz.ClienteRepository;
 
 import java.util.*;
 

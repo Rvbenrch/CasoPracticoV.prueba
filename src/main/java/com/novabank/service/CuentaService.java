@@ -6,8 +6,8 @@ import com.novabank.model.Cliente;
 import com.novabank.model.Cuenta;
 import com.novabank.model.Movimiento;
 import com.novabank.model.TipoMovimiento;
-import com.novabank.repository.CuentaRepository;
-import com.novabank.repository.MovimientoRepository;
+import com.novabank.repository.interfaz.CuentaRepository;
+import com.novabank.repository.interfaz.MovimientoRepository;
 
 import java.util.List;
 

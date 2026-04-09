@@ -6,26 +6,20 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
 
-    private static Connection connection;
-
     private static final String URL = "jdbc:postgresql://localhost:5432/novaBank";
     private static final String USER = "postgres";
     private static final String PASSWORD = "655057621";
 
     private DatabaseConnection() {
-        // Constructor privado para evitar instanciación
+        // Evitar instanciación
     }
 
     public static Connection getConnection() {
-        if (connection == null) {
-            try {
-                connection = DriverManager.getConnection(URL, USER, PASSWORD);
-                System.out.println("Conexión a PostgreSQL establecida correctamente.");
-            } catch (SQLException e) {
-                System.err.println("Error al conectar con la base de datos: " + e.getMessage());
-                throw new RuntimeException(e);
-            }
+        try {
+            return DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (SQLException e) {
+            System.err.println("Error al conectar con la base de datos: " + e.getMessage());
+            throw new RuntimeException("No se pudo establecer la conexión con la base de datos", e);
         }
-        return connection;
     }
 }

@@ -3,7 +3,7 @@ package com.novabank.service;
 import com.novabank.exception.ClienteDuplicadoException;
 import com.novabank.exception.ClienteNoEncontradoException;
 import com.novabank.model.Cliente;
-import com.novabank.repository.ClienteRepository;
+import com.novabank.repository.interfaz.ClienteRepository;
 
 import java.util.List;
 

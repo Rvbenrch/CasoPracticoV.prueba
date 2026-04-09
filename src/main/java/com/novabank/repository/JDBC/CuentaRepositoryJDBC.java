@@ -1,8 +1,9 @@
-package com.novabank.repository;
+package com.novabank.repository.JDBC;
 
 import com.novabank.config.DatabaseConnection;
 import com.novabank.model.Cliente;
 import com.novabank.model.Cuenta;
+import com.novabank.repository.interfaz.CuentaRepository;
 
 import java.sql.*;
 import java.util.ArrayList;

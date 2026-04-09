@@ -1,6 +1,7 @@
-package com.novabank.repository;
+package com.novabank.repository.memoria;
 
 import com.novabank.model.Cuenta;
+import com.novabank.repository.interfaz.CuentaRepository;
 
 import java.util.*;
 

@@ -1,7 +1,7 @@
 
 import com.novabank.exception.ClienteDuplicadoException;
 import com.novabank.model.Cliente;
-import com.novabank.repository.ClienteRepositoryMemory;
+import com.novabank.repository.memoria.ClienteRepositoryMemory;
 import com.novabank.service.ClienteService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
