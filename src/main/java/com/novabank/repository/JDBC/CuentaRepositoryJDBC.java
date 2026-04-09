@@ -6,29 +6,37 @@ import com.novabank.model.Cuenta;
 import com.novabank.repository.interfaz.CuentaRepository;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class CuentaRepositoryJDBC implements CuentaRepository {
 
-    private final Connection connection;
     private final ClienteRepositoryJDBC clienteRepository;
 
     public CuentaRepositoryJDBC() {
-        this.connection = DatabaseConnection.getConnection();
         this.clienteRepository = new ClienteRepositoryJDBC();
     }
 
     @Override
     public Cuenta guardar(Cuenta cuenta) {
-        String sql = "INSERT INTO cuentas (numero_cuenta, cliente_id) VALUES (?, ?)";
+        String sql = "INSERT INTO cuentas (numero_cuenta, cliente_id, saldo, fecha_creacion) " +
+                "VALUES (?, ?, ?, ?) RETURNING id";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
             stmt.setString(1, cuenta.getNumeroCuenta());
             stmt.setLong(2, cuenta.getTitular().getId());
+            stmt.setDouble(3, cuenta.getSaldo());
+            stmt.setTimestamp(4, Timestamp.valueOf(cuenta.getFechaCreacion()));
 
-            stmt.executeUpdate();
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                cuenta.setId(rs.getLong("id"));
+            }
+
             return cuenta;
 
         } catch (SQLException e) {
@@ -40,10 +48,12 @@ public class CuentaRepositoryJDBC implements CuentaRepository {
     public Optional<Cuenta> buscarPorNumeroCuenta(String numeroCuenta) {
         String sql = "SELECT * FROM cuentas WHERE numero_cuenta = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, numeroCuenta);
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
 
+            stmt.setString(1, numeroCuenta);
             ResultSet rs = stmt.executeQuery();
+
             if (rs.next()) {
                 return Optional.of(mapRowToCuenta(rs));
             }
@@ -59,10 +69,12 @@ public class CuentaRepositoryJDBC implements CuentaRepository {
     public List<Cuenta> listarCuentas() {
         String sql = "SELECT * FROM cuentas";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            ResultSet rs = stmt.executeQuery();
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
 
+            ResultSet rs = stmt.executeQuery();
             List<Cuenta> cuentas = new ArrayList<>();
+
             while (rs.next()) {
                 cuentas.add(mapRowToCuenta(rs));
             }
@@ -78,12 +90,13 @@ public class CuentaRepositoryJDBC implements CuentaRepository {
     public List<Cuenta> buscarPorClienteId(Long clienteId) {
         String sql = "SELECT * FROM cuentas WHERE cliente_id = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
             stmt.setLong(1, clienteId);
-
             ResultSet rs = stmt.executeQuery();
-            List<Cuenta> cuentas = new ArrayList<>();
 
+            List<Cuenta> cuentas = new ArrayList<>();
             while (rs.next()) {
                 cuentas.add(mapRowToCuenta(rs));
             }
@@ -96,12 +109,23 @@ public class CuentaRepositoryJDBC implements CuentaRepository {
     }
 
     private Cuenta mapRowToCuenta(ResultSet rs) throws SQLException {
+
+        Long id = rs.getLong("id");
         String numeroCuenta = rs.getString("numero_cuenta");
         Long clienteId = rs.getLong("cliente_id");
+        double saldo = rs.getDouble("saldo");
+        LocalDateTime fechaCreacion = rs.getTimestamp("fecha_creacion").toLocalDateTime();
 
         Cliente cliente = clienteRepository.buscarPorId(clienteId)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado para la cuenta"));
 
-        return new Cuenta(cliente, numeroCuenta);
+
+
+        return new Cuenta(
+                id,
+                cliente,
+                numeroCuenta,
+                saldo,
+                fechaCreacion);
     }
 }

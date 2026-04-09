@@ -12,17 +12,17 @@ import java.util.List;
 
 public class MovimientoRepositoryJDBC implements MovimientoRepository {
 
-    private final Connection connection;
-
     public MovimientoRepositoryJDBC() {
-        this.connection = DatabaseConnection.getConnection();
+        // No guardamos conexión global
     }
 
     @Override
     public Movimiento guardar(Long cuentaId, Movimiento movimiento) {
-        String sql = "INSERT INTO movimientos (cuenta_id, tipo, importe, fecha) VALUES (?, ?, ?, ?) RETURNING id";
+        String sql = "INSERT INTO movimientos (cuenta_id, tipo, importe, fecha) " +
+                "VALUES (?, ?, ?, ?) RETURNING id";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setLong(1, cuentaId);
             stmt.setString(2, movimiento.getTipo().name());
@@ -46,13 +46,13 @@ public class MovimientoRepositoryJDBC implements MovimientoRepository {
     public List<Movimiento> buscarPorCuentaId(Long cuentaId) {
         String sql = "SELECT * FROM movimientos WHERE cuenta_id = ? ORDER BY fecha DESC";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setLong(1, cuentaId);
             ResultSet rs = stmt.executeQuery();
 
             List<Movimiento> movimientos = new ArrayList<>();
-
             while (rs.next()) {
                 movimientos.add(mapRowToMovimiento(rs));
             }
@@ -68,7 +68,8 @@ public class MovimientoRepositoryJDBC implements MovimientoRepository {
     public List<Movimiento> buscarPorCuentaIdYRangoFechas(Long cuentaId, LocalDateTime inicio, LocalDateTime fin) {
         String sql = "SELECT * FROM movimientos WHERE cuenta_id = ? AND fecha BETWEEN ? AND ? ORDER BY fecha DESC";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setLong(1, cuentaId);
             stmt.setTimestamp(2, Timestamp.valueOf(inicio));
@@ -77,7 +78,6 @@ public class MovimientoRepositoryJDBC implements MovimientoRepository {
             ResultSet rs = stmt.executeQuery();
 
             List<Movimiento> movimientos = new ArrayList<>();
-
             while (rs.next()) {
                 movimientos.add(mapRowToMovimiento(rs));
             }
@@ -93,11 +93,12 @@ public class MovimientoRepositoryJDBC implements MovimientoRepository {
     public List<Movimiento> buscarTodos() {
         String sql = "SELECT * FROM movimientos ORDER BY fecha DESC";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             ResultSet rs = stmt.executeQuery();
-            List<Movimiento> movimientos = new ArrayList<>();
 
+            List<Movimiento> movimientos = new ArrayList<>();
             while (rs.next()) {
                 movimientos.add(mapRowToMovimiento(rs));
             }
@@ -110,7 +111,6 @@ public class MovimientoRepositoryJDBC implements MovimientoRepository {
     }
 
     private Movimiento mapRowToMovimiento(ResultSet rs) throws SQLException {
-
         Long id = rs.getLong("id");
         Long cuentaId = rs.getLong("cuenta_id");
         TipoMovimiento tipo = TipoMovimiento.valueOf(rs.getString("tipo"));

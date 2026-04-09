@@ -17,12 +17,11 @@ public class Cuenta {
     private double saldo;
     private LocalDateTime fechaCreacion;
     private List<Movimiento> movimientos;
-    private Long contador = 0L;
+
 
     // Constructor para CUENTAS NUEVAS
     public Cuenta(Cliente titular, String numeroCuenta) {
         this.titular = titular;
-        this.id = contador++;
         this.numeroCuenta = numeroCuenta;
         this.fechaCreacion = LocalDateTime.now();
         this.saldo = 0;
