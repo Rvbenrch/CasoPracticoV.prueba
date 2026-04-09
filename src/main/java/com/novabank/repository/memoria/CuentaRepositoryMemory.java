@@ -37,4 +37,9 @@ public class CuentaRepositoryMemory implements CuentaRepository {
 
         return resultado;
     }
+
+    @Override
+    public void actualizarSaldo(Cuenta cuenta) {
+
+    }
 }
