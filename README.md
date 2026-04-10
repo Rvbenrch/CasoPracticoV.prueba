@@ -1,7 +1,17 @@
 # NovaBank
 Sistema bancario en consola desarrollado en Java
 
+---
 
+## Principles Of Authority
+
+Este proyecto ha sido desarrollado íntegramente por su autor, Rubén M. Rodríguez Chamorro. Su objetivo es simular la creación de un pequeño sistema bancario con fines educativos y demostrativos.
+
+Cualquier similitud con sistemas bancarios reales es pura coincidencia.
+
+El código puede ser consultado libremente, pero no está permitido su uso, copia o reutilización en proyectos públicos o profesionales sin la autorización expresa del autor.
+
+Si deseas utilizar este proyecto, por favor contacta previamente para obtener permiso. Si se detectase un uso indebido del código sin autorización, se emprenderán acciones legales.
 
 ---
 
